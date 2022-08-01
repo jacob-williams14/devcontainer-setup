@@ -1,0 +1,52 @@
+version: "3.9"
+services:
+  application-name-frontend:
+    container_name: application-name-frontend
+    build: ./frontend
+    ports:
+      - 3000:3000
+    volumes:
+      - application-name:/home/app
+    networks:
+      - application-name
+    # Needed to keep the container from exiting
+    stdin_open: true
+  
+  application-name-backend:
+    container_name: application-name-backend
+    build: ./backend
+    depends_on:
+      - application-name-db
+    ports:
+      - 8080:8080
+    volumes:
+      - application-name:/home/app
+    networks:
+      - application-name
+    # Needed to keep the container from exiting
+    stdin_open: true
+
+  application-name-db:
+    container_name: application-name-db
+    image: postgres:13-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: example
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: mydb
+    ports:
+      - 5432:5432
+    volumes:
+      - postgresdata:/var/lib/postgresql/data
+    networks:
+      - application-name
+
+
+volumes:
+  application-name:
+    external: true
+  postgresdata:
+
+networks:
+  application-name:
+    external: true
